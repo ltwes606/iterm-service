@@ -37,7 +37,9 @@ public class BasicItemController {
     }
 
     @GetMapping("/add")
-    public String addForm() {
+    public String addForm(Model model) {
+        // th:object를 사용하기 위해서
+        model.addAttribute("item", new Item());
         return "basic/addForm";
     }
 
