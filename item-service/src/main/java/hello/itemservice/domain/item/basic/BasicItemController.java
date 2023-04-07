@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
@@ -74,60 +73,6 @@ public class BasicItemController {
         // th:object를 사용하기 위해서
         model.addAttribute("item", new Item());
         return "basic/addForm";
-    }
-
-    //    @PostMapping("/add")
-    public String addItemV1(@RequestParam String itemName,
-            @RequestParam int price,
-            @RequestParam Integer quantity,
-            Model model) {
-        Item item = new Item();
-        item.setItemName(itemName);
-        item.setPrice(price);
-        item.setQuantity(quantity);
-
-        itemRepository.save(item);
-
-        model.addAttribute("item", item);
-        return "basic/item";
-    }
-
-    //    @PostMapping("/add")
-    public String addItemV2(@ModelAttribute("item") Item item, Model model) {
-        itemRepository.save(item);
-
-        model.addAttribute("item", item);
-        return "basic/item";
-    }
-
-    /**
-     * ModelAttribute 이름을 생략하면 클래스의 앞글자만 소문자로 변경하여 등록한다.
-     */
-//    @PostMapping("/add")
-    public String addItemV3(@ModelAttribute Item item) {
-        itemRepository.save(item);
-
-        return "basic/item";
-    }
-
-    /**
-     * ModelAttribute도 생략 가능
-     */
-//    @PostMapping("/add")
-    public String addItemV4(Item item) {
-        itemRepository.save(item);
-
-        return "basic/item";
-    }
-
-    //    @PostMapping("/add")
-    public String addItemV5(@ModelAttribute Item item, RedirectAttributes redirectAttributes) {
-
-        itemRepository.save(item);
-
-        redirectAttributes.addAttribute("itemId", item.getId());
-        redirectAttributes.addAttribute("status", true);
-        return "redirect:/basic/items/{itemId}";
     }
 
     @PostMapping("/add")
