@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -75,7 +76,7 @@ public class BasicItemController {
         return "basic/addForm";
     }
 
-//    @PostMapping("/add")
+    //    @PostMapping("/add")
     public String addItemV1(@RequestParam String itemName,
             @RequestParam int price,
             @RequestParam Integer quantity,
@@ -91,7 +92,7 @@ public class BasicItemController {
         return "basic/item";
     }
 
-//    @PostMapping("/add")
+    //    @PostMapping("/add")
     public String addItemV2(@ModelAttribute("item") Item item, Model model) {
         itemRepository.save(item);
 
@@ -119,12 +120,49 @@ public class BasicItemController {
         return "basic/item";
     }
 
-    @PostMapping("/add")
+    //    @PostMapping("/add")
     public String addItemV5(@ModelAttribute Item item, RedirectAttributes redirectAttributes) {
-        log.info("open={}", item.getOpen());
-        log.info("item.regions={}", item.getRegions());
-        log.info("item.itemType={}", item.getItemType());
-        log.info("item.deliveryCode={}", item.getDeliveryCode());
+
+        itemRepository.save(item);
+
+        redirectAttributes.addAttribute("itemId", item.getId());
+        redirectAttributes.addAttribute("status", true);
+        return "redirect:/basic/items/{itemId}";
+    }
+
+    @PostMapping("/add")
+    public String addItemValidationV1(@ModelAttribute Item item,
+            RedirectAttributes redirectAttributes, Model model) {
+
+        // 검증 오류 결과를 보관
+        Map<String, String> errors = new HashMap<>();
+
+        // 검증 로직
+        if (!StringUtils.hasText(item.getItemName())) {
+            errors.put("itemName", "상품 이름은 필수입니다.");
+        }
+        if (item.getPrice() == null
+                || item.getPrice() < 1_000 || item.getPrice() > 1_000_000) {
+            errors.put("price", "가격은 1,000 ~ 1,000,000 까지 허용합니다.");
+        }
+        if (item.getQuantity() == null
+                || item.getQuantity() < 0 || item.getQuantity() > 9_999) {
+            errors.put("quantity", "수량은 최소 0 부터 최대 9,999 까지 허용합니다.");
+        }
+
+        // 특정 필드가 아닌 복합 룰 검증
+        if (item.getPrice() != null && item.getQuantity() != null) {
+            int totalPrice = item.getPrice() * item.getQuantity();
+            if (totalPrice < 10_000) {
+                errors.put("globalError", "가격 * 수량의 합은 10,000원 이상이어야 합니다. 현재 값 = " + totalPrice);
+            }
+        }
+
+        // 검증에 실패시 다시 입력 폼으로
+        if (!errors.isEmpty()) {
+            model.addAttribute("errors", errors);
+            return "/basic/addForm";
+        }
 
         itemRepository.save(item);
 
