@@ -23,38 +23,31 @@
   </div>
   <h4 class="mb-3" th:text="#{page.inputItem}">상품 입력</h4>
   <form action="" method="post" th:object="${item}">
-    <div th:if="${errors?.containsKey('globalError')}">
-      <p class="field-error" th:text="${errors['globalError']}">전체 오류 메시지</p>
+    <div th:if="${#fields.hasGlobalErrors()}">
+      <p class="field-error" th:each="err : ${#fields.globalErrors()}" th:text="${err}">전체 오류 메시지</p>
     </div>
 
     <div>
       <label for="itemName" th:text="#{label.item.itemName}">상품명</label>
       <input type="text" id="itemName" th:field="*{itemName}" class="form-control"
-             th:class="${errors?.containsKey('itemName')} ? 'form-control field-error' :
-             'form-control'"
-             placeholder="이름을 입력하세요">
-      <div class="field-error" th:if="${errors?.containsKey('itemName')}"
-           th:text="${errors['itemName']}">
+             th:errorclass="field-error" placeholder="이름을 입력하세요">
+      <div class="field-error" th:errors="*{itemName}">
       </div>
     </div>
 
     <div>
       <label for="price" th:text="#{label.item.price}">가격</label>
       <input type="text" id="price" th:field="*{price}" class="form-control"
-             th:classappend="${errors?.containsKey('price')} ? 'field-error' : _"
-             placeholder="가격을 입력하세요">
-      <div class="field-error" th:if="${errors?.containsKey('price')}"
-           th:text="${errors['price']}">
+             th:errorclass="field-error" placeholder="가격을 입력하세요">
+      <div class="field-error" th:errors="*{price}">
       </div>
     </div>
 
     <div>
       <label for="quantity" th:text="#{label.item.quantity}">수량</label>
       <input type="text" id="quantity" th:field="*{quantity}" class="form-control"
-             th:classappend="${errors?.containsKey('quantity')} ? 'field-error' : _"
-             placeholder="수량을 입력하세요">
-      <div class="field-error" th:if="${errors?.containsKey('quantity')}"
-           th:text="${errors['quantity']}">
+             th:errorclass="field-error" placeholder="수량을 입력하세요">
+      <div class="field-error" th:errors="*{quantity}">
       </div>
     </div>
 
