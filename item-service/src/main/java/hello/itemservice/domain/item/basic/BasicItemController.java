@@ -4,6 +4,8 @@ import hello.itemservice.domain.item.DeliveryCode;
 import hello.itemservice.domain.item.Item;
 import hello.itemservice.domain.item.ItemRepository;
 import hello.itemservice.domain.item.ItemType;
+import hello.itemservice.domain.item.SaveCheck;
+import hello.itemservice.domain.item.UpdateCheck;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -76,7 +78,7 @@ public class BasicItemController {
     }
 
     @PostMapping("/add")
-    public String addItem(@Validated @ModelAttribute Item item, BindingResult bindingResult,
+    public String addItem(@Validated(SaveCheck.class) @ModelAttribute Item item, BindingResult bindingResult,
             RedirectAttributes redirectAttributes) {
 
         if (item.getPrice() != null && item.getQuantity() != null) {
@@ -112,7 +114,7 @@ public class BasicItemController {
      */
     @PostMapping("/{itemId}/edit")
     public String edit(@PathVariable Long itemId,
-            @Validated @ModelAttribute Item item, BindingResult bindingResult) {
+            @Validated(UpdateCheck.class) @ModelAttribute Item item, BindingResult bindingResult) {
 
         if (item.getPrice() != null && item.getQuantity() != null) {
             int resultPrice = item.getPrice() * item.getQuantity();
