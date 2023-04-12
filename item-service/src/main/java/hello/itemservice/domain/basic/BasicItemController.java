@@ -1,4 +1,4 @@
-package hello.itemservice.domain.item.basic;
+package hello.itemservice.domain.basic;
 
 import hello.itemservice.domain.item.DeliveryCode;
 import hello.itemservice.domain.item.Item;
@@ -6,6 +6,8 @@ import hello.itemservice.domain.item.ItemRepository;
 import hello.itemservice.domain.item.ItemType;
 import hello.itemservice.domain.item.SaveCheck;
 import hello.itemservice.domain.item.UpdateCheck;
+import hello.itemservice.web.validation.form.ItemSaveForm;
+import hello.itemservice.web.validation.form.ItemUpdateForm;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -78,11 +80,11 @@ public class BasicItemController {
     }
 
     @PostMapping("/add")
-    public String addItem(@Validated(SaveCheck.class) @ModelAttribute Item item, BindingResult bindingResult,
+    public String addItem(@Validated @ModelAttribute("item") ItemSaveForm form, BindingResult bindingResult,
             RedirectAttributes redirectAttributes) {
 
-        if (item.getPrice() != null && item.getQuantity() != null) {
-            int resultPrice = item.getPrice() * item.getQuantity();
+        if (form.getPrice() != null && form.getQuantity() != null) {
+            int resultPrice = form.getPrice() * form.getQuantity();
             if (resultPrice < 10000) {
                 bindingResult.reject("totalPriceMin", new Object[]{10000, resultPrice}, null);
             }
@@ -94,9 +96,19 @@ public class BasicItemController {
             return "/basic/addForm";
         }
 
-        itemRepository.save(item);
+        // 성공 로직
+        Item item = new Item();
+        item.setItemName(form.getItemName());
+        item.setPrice(form.getPrice());
+        item.setQuantity(form.getQuantity());
+        item.setOpen(form.getOpen());
+        item.setRegions(form.getRegions());
+        item.setItemType(form.getItemType());
+        item.setDeliveryCode(form.getDeliveryCode());
 
-        redirectAttributes.addAttribute("itemId", item.getId());
+        Item saveItem = itemRepository.save(item);
+
+        redirectAttributes.addAttribute("itemId", saveItem.getId());
         redirectAttributes.addAttribute("status", true);
         return "redirect:/basic/items/{itemId}";
     }
@@ -114,10 +126,10 @@ public class BasicItemController {
      */
     @PostMapping("/{itemId}/edit")
     public String edit(@PathVariable Long itemId,
-            @Validated(UpdateCheck.class) @ModelAttribute Item item, BindingResult bindingResult) {
+            @Validated @ModelAttribute("item") ItemUpdateForm form, BindingResult bindingResult) {
 
-        if (item.getPrice() != null && item.getQuantity() != null) {
-            int resultPrice = item.getPrice() * item.getQuantity();
+        if (form.getPrice() != null && form.getQuantity() != null) {
+            int resultPrice = form.getPrice() * form.getQuantity();
             if (resultPrice < 10000) {
                 bindingResult.reject("totalPriceMin", new Object[]{10000, resultPrice}, null);
             }
@@ -129,9 +141,17 @@ public class BasicItemController {
 
             return "/basic/editForm";
         }
-        ;
 
-        itemRepository.update(itemId, item);
+        Item itemParam = new Item();
+        itemParam.setItemName(form.getItemName());
+        itemParam.setPrice(form.getPrice());
+        itemParam.setQuantity(form.getQuantity());
+        itemParam.setOpen(form.getOpen());
+        itemParam.setRegions(form.getRegions());
+        itemParam.setItemType(form.getItemType());
+        itemParam.setDeliveryCode(form.getDeliveryCode());
+
+        itemRepository.update(itemId, itemParam);
         return "redirect:/basic/items/{itemId}";
     }
 
