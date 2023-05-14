@@ -4,7 +4,7 @@ import javax.validation.constraints.NotEmpty;
 import lombok.Data;
 
 @Data
-public class member {
+public class Member {
     private Long id;
 
     @NotEmpty
